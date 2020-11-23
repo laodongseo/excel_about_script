@@ -7,20 +7,23 @@ import pandas as pd
 from urllib.parse import unquote
 
 # 最终excel列的顺序
-cols_last = ['cityid','城市','租房房源','二手房房源','总房源']
+cols_last = ['cityid','cityname','sale房源','rent房源','总房源']
 # 指定多重索引(2个excel哪些列求并集)
 index_cols = ['communityid','communityname']
 
-df_dict_rent = pd.read_excel('小区_rent_分城市_new.xlsx',sheet_name=None)
-df_dict_sale = pd.read_excel('小区_sale_分城市_new.xlsx',sheet_name=None)
+df_dict_rent = pd.read_excel('小区_sale_add_city_del_nan_str_city.xlsx',sheet_name=None)
+df_dict_sale = pd.read_excel('小区_rent_add_city_del_nan_str_city.xlsx',sheet_name=None)
 sheet_names_rent,sheet_names_sale, = df_dict_rent.keys(),df_dict_sale.keys()
 
 if sheet_names_rent == sheet_names_sale:
-    with pd.ExcelWriter('hebing.xlsx') as writer:
+    with pd.ExcelWriter('xiaoqu_hebing.xlsx') as writer:
         for sheet_name in sheet_names_rent:
             df_rent = df_dict_rent[sheet_name]
             df_sale = df_dict_sale[sheet_name]
-            cityid, city_name = df_sale['cityid'].to_list()[0], df_sale['城市'].to_list()[0]
+            cityid, city_name = df_sale['cityid'].to_list()[0], df_sale['cityname'].to_list()[0]
+            del df_sale['cityid'],df_sale['cityname']
+            del df_rent['cityid'],df_rent['cityname']
+            
             # 分别set索引
             df_rent.set_index(index_cols, inplace=True)
             df_sale.set_index(index_cols, inplace=True)
@@ -37,15 +40,15 @@ if sheet_names_rent == sheet_names_sale:
             df_sale_new = df_sale.reindex(index_all_unique, fill_value=0)
 
             # 修改特定列
-            df_rent_new['城市'] = city_name
+            df_rent_new['cityname'] = city_name
             df_sale_new['cityid'] = cityid
-            df_rent_new.rename(columns={"COUNT(*)": "租房房源"},inplace=True)
-            df_sale_new.rename(columns={"COUNT(*)": "二手房房源"},inplace=True)
-            del df_sale_new['cityid'],df_sale_new['城市']
+            # df_rent_new.rename(columns={"COUNT(*)": "租房房源"},inplace=True)
+            # df_sale_new.rename(columns={"COUNT(*)": "二手房房源"},inplace=True)
+            # del df_sale_new['cityid'],df_sale_new['cityname']
 
             # 拼接
             df_last = pd.concat([df_rent_new, df_sale_new], axis=1)
-            df_last['总房源'] = df_last['租房房源'] + df_last['二手房房源']
+            df_last['总房源'] = df_last['rent房源'] + df_last['sale房源']
             df_last = df_last[cols_last]
             df_last.to_excel(writer,sheet_name=city_name)
 else:
