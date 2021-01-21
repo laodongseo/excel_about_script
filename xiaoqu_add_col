@@ -1,0 +1,61 @@
+# ‐*‐ coding: utf‐8 ‐*‐
+"""
+给1个excel的每个sheet新增一列
+
+"""
+import pandas as pd
+
+city_domain_config1 = {
+'bj':'https://bj.5i5j.com/',
+'hz':'https://hz.5i5j.com/',
+'sz':'https://sz.5i5j.com/',
+'ty':'https://ty.5i5j.com/',
+'tj':'https://tj.5i5j.com/',
+'nj':'https://nj.5i5j.com/',
+'sh':'https://sh.5i5j.com/',
+'cd':'https://cd.5i5j.com/',
+'nn':'https://nn.5i5j.com/',
+'zz':'https://zz.5i5j.com/',
+'wx':'https://wx.5i5j.com/',
+'wh':'https://wh.5i5j.com/',
+'qd':'https://qd.5i5j.com/',
+'cs':'https://cs.5i5j.com/',
+'nc':'https://nc.5i5j.com/',
+'cz':'https://cz.5i5j.com/'}
+
+city_domain_config2 = {
+'北京':'https://bj.5i5j.com/',
+'杭州':'https://hz.5i5j.com/',
+'苏州':'https://sz.5i5j.com/',
+'太原':'https://ty.5i5j.com/',
+'天津':'https://tj.5i5j.com/',
+'南京':'https://nj.5i5j.com/',
+'上海':'https://sh.5i5j.com/',
+'成都':'https://cd.5i5j.com/',
+'南宁':'https://nn.5i5j.com/',
+'郑州':'https://zz.5i5j.com/',
+'无锡':'https://wx.5i5j.com/',
+'武汉':'https://wh.5i5j.com/',
+'青岛':'https://qd.5i5j.com/',
+'长沙':'https://cs.5i5j.com/',
+'南昌':'https://nc.5i5j.com/',
+'常州':'https://cz.5i5j.com/'}
+
+writer=pd.ExcelWriter('xiaoqu_hebing_str_add.xlsx')
+_excel = 'xiaoqu_hebing_str.xlsx'
+
+df_sheets_dict = pd.read_excel(_excel,sheet_name=None)
+for sheet_name,df_sheet in df_sheets_dict.items():
+    urls = []
+    sheet_iter = df_sheet.iterrows()
+    for row in sheet_iter:
+        index_num = row[0]
+        xiaoqu_id = row[1]['communityid']
+        domain = city_domain_config2[sheet_name]
+        xiaoqu_url = f'{domain}xiaoqu/{xiaoqu_id}.html'
+        urls.append(xiaoqu_url)
+    s_col_add = pd.Series(urls)
+    df_sheet['小区url'] = s_col_add
+    df_sheet['communityid'] = df_sheet['communityid'].astype('str').astype('string')
+    df_sheet.to_excel(writer,sheet_name=sheet_name,index=False)
+writer.close()
