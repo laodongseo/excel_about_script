@@ -1,11 +1,28 @@
 
 # -*- coding:UTF-8 -*-
 """
-批量处理多个excel或者csv
-把科学计数法的列(必须是整数)变为字符串显示
+批量处理某个文件夹下多个excel或者csv
+把科学计数法的列(必须是整数否则有误差)变为字符串显示
+支持传入多个列
 """
 import pandas as pd
 import os
+
+# 获取某个目录下的特定文件(含路径,非递归),ext为文件后缀(带点)
+def get_files(file_path,ext):
+    file_list = []
+    dir_or_files = os.listdir(file_path)
+    # dir_or_file纯文件名+后缀,不带路径
+    for dir_or_file in dir_or_files:
+        # 给目录或者文件添加路径
+        dir_file_path = os.path.join(file_path, dir_or_file)
+        # 判断该路径为文件还是路径
+        if os.path.isdir(dir_file_path):
+            pass
+        else:
+            if os.path.splitext(dir_file_path)[-1] == ext:
+                file_list.append(dir_file_path)
+    return file_list
 
 
 def excel_to_str(excel_files, *cols):
@@ -32,9 +49,9 @@ def csv_to_str(csv_files, *cols, encode_now='GB18030'):
 
 
 if __name__ == "__main__":
-    # excel文件
-    excel_files = ['./小区_sale.csv_分城市.xlsx', './小区_rent.csv_分城市.xlsx']
-    # csv文件
-    csvs = ['小区_sale.csv', '小区_rent.csv']
-    # 对应的函数
-    excel_to_str(excel_files, 'communityid')
+    file_path,ext = './','.xlsx'
+    files = get_files(file_path,ext)
+    if ext == '.csv':
+        csv_to_str(files,'communityid')
+    else:
+        excel_to_str(files,'communityid')
