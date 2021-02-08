@@ -1,6 +1,7 @@
 # -*- coding:UTF-8 -*-
 """
-批量检查excel或者csv是否有空值并输出含空值的列
+批量删除某个文件夹里批量检查excel或者csv是否有空值并输出含空值的列
+
 """
 import pandas as pd
 import os
