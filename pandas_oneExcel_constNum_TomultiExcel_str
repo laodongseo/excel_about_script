@@ -1,0 +1,32 @@
+# -*- coding: utf-8 -*-
+"""
+按固定行数分割1个大excel文件为多个
+小区ID列分割后指定为字符串
+"""
+import pandas as pd
+import math
+
+excel_name = 'nj_2021022'
+df = pd.read_excel('{0}.xlsx'.format(excel_name))
+rows,cols = df.shape # 获取行数列数,默认第一列表头不算行数
+
+split_num = 200 # 指定分割行数
+value = math.floor(rows/split_num) # 标准分割次数
+rows_format = value*split_num # 标准分割所占用总行数
+new_list = [[i,i+split_num] for i in range(0,rows_format,split_num)]
+df_last = pd.DataFrame()
+
+# 标准行数文件
+for start_end in new_list:
+    excel_format = pd.DataFrame(columns=['城市ID','小区ID'],index=range(split_num))
+    start,end = start_end
+    excel_format.iloc[:,:] = df.iloc[start:end]
+    excel_format.loc[:,'小区ID'] = excel_format['小区ID'].astype('str').astype('string')
+    # index为False,否则就把行索引写入了
+    excel_format.to_excel(f'{excel_name}_{start}_{end}.xlsx',index=False)
+
+# 最后分割出的文件
+df_last = pd.DataFrame(columns=['城市ID','小区ID'],index=range(rows-rows_format))
+df_last.iloc[:,:] = df.iloc[rows_format:]
+df_last.loc[:,'小区ID'] = df_last['小区ID'].astype('str').astype('string')
+df_last.to_excel('{0}_last.xlsx'.format(excel_name),index=False)
