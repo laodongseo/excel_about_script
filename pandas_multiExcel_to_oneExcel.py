@@ -32,7 +32,7 @@ def concat_file(files):
         # 循环每个df拼接成一个,0是上下拼接
         df_concat = pandas.concat([df_concat, df],axis=0)
         # 写入新的excel
-        df_concat.to_excel(f'{root_path}_concat_res.xlsx',index=False)
+    df_concat.to_excel(f'{root_path}_concat_res.xlsx',index=False)
 
 
 if __name__ == "__main__":
