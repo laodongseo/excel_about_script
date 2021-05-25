@@ -24,7 +24,7 @@ def get_files(file_path, ext):
 
 
 def contains_col(excel_file,ReStrContain=None,ReStrNotContain=None):
-    if not ReStrContain and not ReStrContain:
+    if not ReStrContain and not ReStrNotContain:
         print('无筛选条件,退出...')
         sys.exit()
     df_dict = pd.read_excel(excel_file,sheet_name=None)
