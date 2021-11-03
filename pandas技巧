@@ -1,0 +1,45 @@
+1、pandas注意事项：
+空值影响
+1）影响数据类型，读取excel后一个数值序列如果含空值会变为浮点型；
+2）可空的数据类型某1列含有空值，不影响做数据类型转换。
+3）可空数据类型的空值不参与比较(==,!=)及四则运算，所以如果不处理空值就进行比较(==,!=)筛选相当于直接扔掉空值部分。
+
+2、merge注意：
+互相关联的两列数据类型一致再进行merge，否则报错或者匹配不到数据。
+保证多对一的关系，如果出现多对多最后出现的行数会增多。
+
+3、转换为字符串结果有差异
+df = pd.DataFrame([[np.nan, 2, np.nan, 0],
+                   [3, 4, np.nan, 1],
+                   [np.nan, np.nan, np.nan, 5],
+                   [np.nan, 3, np.nan, 4]],
+                  columns=list('ABCD'))
+
+s1 = df['A'].astype('Int64').astype('str').astype('string')
+print(s1.to_frame().to_excel('test.xlsx')) # 这种会把<NA>写入
+s2 = df['A'].astype('Int64').astype('string') # 这种是空单元格
+print(s1.to_frame().to_excel('test.xlsx'))
+
+4、读取csv文件
+(notepad++打开是ucs-2与ucs-4编码)依次测试 utf-8,ISO-8859-1、GB18030都不可以,utf-16可行。
+https://stackoverflow.com/questions/14488346/python-3-reading-ucs-2-be-file
+https://blog.csdn.net/m0_38080253/article/details/78841280
+
+5、时间序列选取数据
+2021-01-01 00:00:00 <class 'pandas._libs.tslibs.timestamps.Timestamp'>
+2021-01-01 00:00:00 <class 'datetime.datetime'>
+pd.Timestamp(2020,10,11) == datetime.datetime(2020,10,11)
+以上两种对象是==关系。
+
+6、浮点转为整型
+cannot safely cast non-equivalent float64 to int16
+1.0、2.0这种才可以转int
+
+7、read_csv 如果遇上文件有逗号但是文件结尾没有逗号配对,会导致error: EOF inside string starting at row
+8、取消科学计数法显示 指定小数位数
+      np.set_printoptions(suppress=True)
+      pd.set_option('display.float_format', lambda x: '%.10f' % x) #10个小数点
+9、写入excel时url链接转为字符串
+with pd.ExcelWriter('xiaoqu.xlsx',engine='xlsxwriter',engine_kwargs={"options":{'strings_to_urls': False}}) as writer
+10 query函数要保证每个df本身的索引值是唯一的
+11 11 groupby后对每个子df操作后 返回值可能有多级索引，df_res = df.groupby('xx').apply(func)。 df_res可能是多级索引
