@@ -12,7 +12,7 @@ def vlookup(excel_left,excel_right,cols_right_need,left_col,right_col):
 	df_left = pd.read_excel(excel_left)
 	df_right = pd.read_excel(excel_right)
 
-	with pd.ExcelWriter('./merge_res.xlsx') as writer:
+	with pd.ExcelWriter('./merge_res.xlsx',,engine_kwargs={"options":{'strings_to_urls': False}}) as writer:
 		if not cols_right_need:
 			df = df_left.merge(df_right,left_on=left_col, right_on=right_col)
 		else:
