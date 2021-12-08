@@ -5,26 +5,27 @@
 """
 import pandas as pd
 import math
+import os
 
 
-def split_excel(excel_name,split_num):
-    df = pd.read_excel(f'{excel_name}.xlsx')
-    rows,cols = df.shape # 行数列数,默认第一列表头不算行数
-    value = math.floor(rows/split_num) # 标准分割次数
-    rows_format = value*split_num # 标准分割所占用总行数
-    new_list = [[i,i+split_num] for i in range(0,rows_format,split_num)]
+def split_excel(excel_file,constNum):
+	df = pd.read_excel(excel_file)
+	rows,cols = df.shape # 默认第一行表头不算行数
+	split_times = math.floor(rows/constNum) # 标准分割次数
+	split_rows_count = split_times*constNum # 标准分割所占用总行数
+	new_list = [(start,start+constNum) for start in range(0,split_rows_count,constNum)]
+	print(new_list)
+	filename = os.path.basename(excel_file)
+	# 标准行数文件,start,end为索引
+	for start,end in new_list:
+		excel_small = df[start:end]
+		excel_small.to_excel(f'{filename}_{start+1}_{end}.xlsx',index=False)
 
-    # 标准行数文件
-    for i_j in new_list:
-        i,j = i_j
-        excel_small = df[i:j]
-        excel_small.to_excel(f'{excel_name}_{i}_{j}.xlsx',index=False)
-
-    # 剩余的行分割出的文件
-    df[rows_format:].to_excel(f'{excel_name}_last.xlsx',index=False)
+	# 剩余的行分割出文件
+	df[split_rows_count:].to_excel(f'{filename}_last.xlsx',index=False)
 
 
 if __name__ == '__main__':
-    excel_name = 'school_info' # 不带后缀
-    split_num = 200 # 多个行分割为1个excel
-    split_excel(excel_name,split_num)
+	excel_file = '2021-12-08_东莞_sale.xlsx'
+	constNum = 200 # 固定行数分割excel
+	split_excel(excel_file,constNum)
