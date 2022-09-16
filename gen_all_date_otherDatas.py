@@ -1,37 +1,20 @@
-"""
-分月分城市 可能会缺少月和城市
-"""
+DictData = {
+'date':pd.date_range(start='20220720', end='20220721'),
+'city':['北京','上海','南京','苏州'],
+'b_type':['租房','二手房','新房'],
 
-city_order = """
-北京
-杭州
-天津
-上海
-南京
-太原
-常州
-无锡
-东莞
-郑州
-南昌
-长沙
-青岛
-西安咸阳
-临汾
-呼和浩特
-烟台
-合肥
-赤峰
-临沂
-"""
-citys = [i.strip() for i in city_order.split('\n') if i.strip()]
+}
 
-df_config = pd.DataFrame()
-DatetimeIndex = pd.date_range(start='20220427', end='20220721')
-for city in citys:
-	df_one = pd.DataFrame(index=DatetimeIndex)
-	df_one['城市'] = city
-	df_config = pd.concat([df_config,df_one],axis=0)
-df_config.index.name='日期'
-df_config.reset_index(inplace=True)
-df_config.to_excel('aaa.xlsx',index=False)
+
+rows = []
+row = []
+for date in DictData['date']:
+	for city in DictData['city']:
+		for b_type in DictData['b_type']:
+			row.extend([date,city,b_type])
+			rows.append(row)
+			row = []
+
+df = pd.DataFrame(data=rows,columns=DictData.keys())
+with pd.ExcelWriter('aa.xlsx',datetime_format='YYYY-MM-DD') as f:
+	df.to_excel(f,'aa')
